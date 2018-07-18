@@ -1,6 +1,12 @@
 ﻿# dotnetGen_sqlserver
 .NETCore + SqlServer 生成器
 
+----
+
+没有枚举，没有set，没有gis，没有数组，没有字典，没有json……还死贵……请问拿什么爱你，sqlserver……开过跑车真不想再来开这台拖拉机，请使用postgresql或mysql！
+
+-------
+
 本项目为生成器，用于快速创建和更新 .NETCore + SqlServer 项目，非常合适敏捷开发；
 
 优势：
