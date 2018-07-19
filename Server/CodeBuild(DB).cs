@@ -10,18 +10,29 @@ namespace Server {
 		private ClientInfo _client;
 		private AcceptSocket _socket;
 		private List<TableInfo> _tables;
+		private Dictionary<string, Dictionary<string, string>> _column_coments = new Dictionary<string, Dictionary<string, string>>();
 
 		public CodeBuild(ClientInfo client, AcceptSocket socket) {
 			_client = client;
 			_socket = socket;
 		}
 
-		private DataSet GetDataSet(string commandText) {
+		private object[][] GetDataSet(string commandText) {
 			SocketMessager messager = new SocketMessager("ExecuteDataSet", commandText);
-			_socket.Write(messager, delegate(object sender, ServerSocketReceiveEventArgs e) {
+			_socket.Write(messager, delegate (object sender, ServerSocketReceiveEventArgs e) {
 				messager = e.Messager;
 			});
-			return messager.Arg as DataSet;
+			object[][] ret = messager.Arg as object[][]; //兼容.netcore传过来的数据
+			if (ret == null) {
+				DataSet ds = messager.Arg as DataSet; //兼容.net传过来的数据
+				if (ds != null) {
+					List<object[]> tmp = new List<object[]>();
+					foreach (DataRow row in ds.Tables[0].Rows)
+						tmp.Add(row.ItemArray);
+					ret = tmp.ToArray();
+				}
+			}
+			return ret;
 		}
 		private int ExecuteNonQuery(string commandText) {
 			SocketMessager messager = new SocketMessager("ExecuteNonQuery", commandText);
@@ -38,11 +49,11 @@ namespace Server {
 
 			List<DatabaseInfo> loc1 = null;
 
-			DataSet ds = this.GetDataSet(@"select name from sys.databases");
+			object[][] ds = this.GetDataSet(@"select name from sys.databases where name not in ('master','tempdb','model','msdb')");
 			if (ds == null) return loc1;
 
 			loc1 = new List<DatabaseInfo>();
-			foreach (DataRow row in ds.Tables[0].Rows) {
+			foreach (object[] row in ds) {
 				loc1.Add(new DatabaseInfo(string.Concat(row[0])));
 			}
 			return loc1;
@@ -56,7 +67,7 @@ namespace Server {
 			Dictionary<int, TableInfo> loc2 = new Dictionary<int, TableInfo>();
 			Dictionary<int, Dictionary<string, ColumnInfo>> loc3 = new Dictionary<int, Dictionary<string, ColumnInfo>>();
 
-			DataSet ds = this.GetDataSet(@"
+			object[][] ds = this.GetDataSet(@"
 select 
  a.Object_id
 ,b.name 'Owner'
@@ -64,7 +75,15 @@ select
 ,'T' type
 from sys.tables a
 inner join sys.schemas b on b.schema_id = a.schema_id
-where a.name <> 'nicpetshop_config_fk'
+where not(b.name = 'dbo' and a.name = 'sysdiagrams')
+union all
+select
+ a.Object_id
+,b.name 'Owner'
+,a.name 'Name'
+,'V' type
+from sys.views a
+inner join sys.schemas b on b.schema_id = a.schema_id
 union all
 select 
  a.Object_id
@@ -80,7 +99,7 @@ order by type desc, b.name, a.name
 
 			List<int> loc6 = new List<int>();
 			List<int> loc66 = new List<int>();
-			foreach (DataRow row in ds.Tables[0].Rows) {
+			foreach (object[] row in ds) {
 				int object_id = int.Parse(string.Concat(row[0]));
 				string owner = string.Concat(row[1]);
 				string table = string.Concat(row[2]);
@@ -88,6 +107,7 @@ order by type desc, b.name, a.name
 				loc2.Add(object_id, new TableInfo(object_id, owner, table, type));
 				loc3.Add(object_id, new Dictionary<string, ColumnInfo>());
 				switch (type) {
+					case "V":
 					case "T":
 						loc6.Add(object_id);
 						break;
@@ -102,7 +122,8 @@ order by type desc, b.name, a.name
 
 			string tsql_place = @"
 select 
- a.Object_id
+concat(e.name,'.',d.name)
+,a.Object_id
 ,a.name 'Column'
 ,b.name 'Type'
 ,case
@@ -116,8 +137,12 @@ select
   else cast(a.max_length as varchar) end + ')'
  when b.name in ('Numeric', 'Decimal') then '(' + cast(a.precision as varchar) + ',' + cast(a.scale as varchar) + ')'
  else '' end as 'SqlType'
+,c.value
 {0} a
 inner join sys.types b on b.user_type_id = a.user_type_id
+left join sys.extended_properties AS c ON c.major_id = a.object_id AND c.minor_id = a.column_id
+left join sys.tables d on d.object_id = a.object_id
+left join sys.schemas e on e.schema_id = d.schema_id
 where a.object_id in ({1})
 ";
 			string tsql = string.Format(tsql_place, @"
@@ -134,18 +159,24 @@ from sys.parameters", loc88);
 			ds = this.GetDataSet(tsql);
 			if (ds == null) return loc1;
 
-			foreach (DataRow row in ds.Tables[0].Rows) {
-				int object_id = int.Parse(string.Concat(row[0]));
-				string column = string.Concat(row[1]);
-				string type = string.Concat(row[2]);
-				int max_length = int.Parse(string.Concat(row[3]));
-				string sqlType = string.Concat(row[4]);
-				bool is_nullable = bool.Parse(string.Concat(row[5]));
-				bool is_identity = bool.Parse(string.Concat(row[6]));
+			foreach (object[] row in ds) {
+				string table_id = string.Concat(row[0]);
+				int object_id = int.Parse(string.Concat(row[1]));
+				string column = string.Concat(row[2]);
+				string type = string.Concat(row[3]);
+				int max_length = int.Parse(string.Concat(row[4]));
+				string sqlType = string.Concat(row[5]);
+				string comment = string.Concat(row[6]);
+				if (string.IsNullOrEmpty(comment)) comment = column;
+				bool is_nullable = bool.Parse(string.Concat(row[7]));
+				bool is_identity = bool.Parse(string.Concat(row[8]));
 				if (max_length == 0) max_length = -1;
 				loc3[object_id].Add(column, new ColumnInfo(
 					column, CodeBuild.GetDBType(type), max_length, sqlType,
 					DataSort.NONE, is_nullable, is_identity, false, false));
+				if (!_column_coments.ContainsKey(table_id)) _column_coments.Add(table_id, new Dictionary<string, string>());
+				if (!_column_coments[table_id].ContainsKey(column)) _column_coments[table_id].Add(column, comment);
+				else _column_coments[table_id][column] = comment;
 			}
 
 			ds = this.GetDataSet(string.Format(@"
@@ -166,7 +197,7 @@ where a.object_id in ({0})
 
 			Dictionary<int, Dictionary<int, List<ColumnInfo>>> indexColumns = new Dictionary<int, Dictionary<int, List<ColumnInfo>>>();
 			Dictionary<int, Dictionary<int, List<ColumnInfo>>> uniqueColumns = new Dictionary<int, Dictionary<int, List<ColumnInfo>>>();
-			foreach (DataRow row in ds.Tables[0].Rows) {
+			foreach (object[] row in ds) {
 				int object_id = int.Parse(string.Concat(row[0]));
 				string column = string.Concat(row[1]);
 				int index_id = int.Parse(string.Concat(row[2]));
@@ -230,7 +261,7 @@ where b.object_id in ({0})
 			if (ds == null) return loc1;
 
 			Dictionary<int, Dictionary<int, ForeignKeyInfo>> fkColumns = new Dictionary<int, Dictionary<int, ForeignKeyInfo>>();
-			foreach (DataRow row in ds.Tables[0].Rows) {
+			foreach (object[] row in ds) {
 				int object_id, fk_id, referenced_object_id ;
 				int.TryParse(string.Concat(row[0]), out object_id);
 				string column = string.Concat(row[1]);

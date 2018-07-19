@@ -319,7 +319,7 @@ namespace MakeCode {
 			this.MaximizeBox = false;
 			this.Name = "FrmMain";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "代码生成器";
+			this.Text = "代码生成器(.NET Core + SQLServer)";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
 			this.Load += new System.EventHandler(this.FrmMain_Load);
 			((System.ComponentModel.ISupportInitialize)(this.dgvGridview)).EndInit();

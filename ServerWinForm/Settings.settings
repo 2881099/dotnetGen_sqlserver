@@ -6,7 +6,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="socket_port" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">28888</Value>
+      <Value Profile="(Default)">29918</Value>
     </Setting>
   </Settings>
 </SettingsFile>

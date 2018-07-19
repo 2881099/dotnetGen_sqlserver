@@ -12,7 +12,7 @@ namespace ServerWinService {
 
 			spi.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
 			si.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
-			si.ServiceName = "Microsoft MVC 10.0 (Core + SqlServer)";
+			si.ServiceName = "Microsoft MVC 10.0 (Core + SQLServer)";
 			si.Description = "This service must be run automatically.";
 
 			Installers.Add(spi);

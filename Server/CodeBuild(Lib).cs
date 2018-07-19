@@ -27,8 +27,11 @@ namespace Server {
 				case "float": return SqlDbType.Float;
 				case "real": return SqlDbType.Real;
 				case "date": return SqlDbType.Date;
-				case "datetime": return SqlDbType.DateTime;
+				case "datetime":
+				case "datetime2": return SqlDbType.DateTime;
+				case "datetimeoffset": return SqlDbType.DateTimeOffset;
 				case "smalldatetime": return SqlDbType.SmallDateTime;
+				case "time": return SqlDbType.Time;
 				case "char": return SqlDbType.Char;
 				case "varchar": return SqlDbType.VarChar;
 				case "text": return SqlDbType.Text;
@@ -41,36 +44,6 @@ namespace Server {
 				case "timestamp": return SqlDbType.Timestamp;
 				case "uniqueidentifier": return SqlDbType.UniqueIdentifier;
 				default: return SqlDbType.Variant;
-			}
-		}
-
-		protected static string GetDBDefault(string strType, string defaultValue) {
-			switch (GetDBType(strType)) {
-				case SqlDbType.Bit: return defaultValue == null ? "false" : defaultValue;
-				case SqlDbType.TinyInt:
-				case SqlDbType.SmallInt:
-				case SqlDbType.Int:
-				case SqlDbType.BigInt:
-				case SqlDbType.Decimal:
-				case SqlDbType.SmallMoney:
-				case SqlDbType.Money:
-				case SqlDbType.Float:
-				case SqlDbType.Real: return defaultValue == null ? "0" : defaultValue;
-				case SqlDbType.Date:
-				case SqlDbType.DateTime:
-				case SqlDbType.SmallDateTime: return defaultValue == null ? "\"getdate()\"" : ("\"" + defaultValue.ToLower() + "\"");
-				case SqlDbType.Char:
-				case SqlDbType.VarChar:
-				case SqlDbType.Text:
-				case SqlDbType.NChar:
-				case SqlDbType.NVarChar:
-				case SqlDbType.NText: return defaultValue == null ? "\"\"" : ("\"" + defaultValue + "\"");
-				case SqlDbType.UniqueIdentifier: return defaultValue == null ? "\"newid()\"" : ("\"" + defaultValue.ToLower() + "\"");
-				case SqlDbType.Binary:
-				case SqlDbType.VarBinary:
-				case SqlDbType.Image:
-				case SqlDbType.Timestamp:
-				default: return defaultValue == null ? "\"\"" : ("\"" + defaultValue + "\"");
 			}
 		}
 
@@ -88,7 +61,10 @@ namespace Server {
 				case SqlDbType.Real: return "(float?)";
 				case SqlDbType.Date:
 				case SqlDbType.DateTime:
+				case SqlDbType.DateTime2:
 				case SqlDbType.SmallDateTime: return "(DateTime?)";
+				case SqlDbType.DateTimeOffset: return "(DateTimeOffset?)";
+				case SqlDbType.Time: return "(TimeSpan?)";
 				case SqlDbType.Char:
 				case SqlDbType.VarChar:
 				case SqlDbType.Text:
@@ -99,7 +75,7 @@ namespace Server {
 				case SqlDbType.VarBinary:
 				case SqlDbType.Image: return "(byte[])";
 				case SqlDbType.UniqueIdentifier: return "(Guid?)";
-				case SqlDbType.Timestamp:
+				case SqlDbType.Timestamp: return "(byte[])";
 				default: return "";
 			}
 		}
@@ -118,7 +94,10 @@ namespace Server {
 				case SqlDbType.Real:
 				case SqlDbType.Date:
 				case SqlDbType.DateTime:
+				case SqlDbType.DateTime2:
 				case SqlDbType.SmallDateTime: return "{0}.Value";
+				case SqlDbType.DateTimeOffset: return "{0}.Value";
+				case SqlDbType.Time: return "{0}.Value";
 				case SqlDbType.Char:
 				case SqlDbType.VarChar:
 				case SqlDbType.Text:
@@ -129,7 +108,7 @@ namespace Server {
 				case SqlDbType.VarBinary:
 				case SqlDbType.Image:
 				case SqlDbType.UniqueIdentifier: return "string.Concat({0})";
-				case SqlDbType.Timestamp:
+				case SqlDbType.Timestamp: return "string.Concat({0})";
 				default: return "string.Concat({0})";
 			}
 		}
@@ -147,7 +126,10 @@ namespace Server {
 				case SqlDbType.Real: return "float?";
 				case SqlDbType.Date:
 				case SqlDbType.DateTime:
+				case SqlDbType.DateTime2:
 				case SqlDbType.SmallDateTime: return "DateTime?";
+				case SqlDbType.DateTimeOffset: return "DateTimeOffset?";
+				case SqlDbType.Time: return "TimeSpan?";
 				case SqlDbType.Char:
 				case SqlDbType.VarChar:
 				case SqlDbType.Text:
@@ -158,96 +140,8 @@ namespace Server {
 				case SqlDbType.VarBinary:
 				case SqlDbType.Image: return "byte[]";
 				case SqlDbType.UniqueIdentifier: return "Guid?";
-				case SqlDbType.Timestamp:
+				case SqlDbType.Timestamp: return "byte[]";
 				default: return "object";
-			}
-		}
-		protected static string GetCSType2(SqlDbType type) {
-			switch (type) {
-				case SqlDbType.Bit: return "Boolean";
-				case SqlDbType.TinyInt: return "Byte";
-				case SqlDbType.SmallInt: return "Int16";
-				case SqlDbType.Int: return "Int32";
-				case SqlDbType.BigInt: return "Int64";
-				case SqlDbType.Decimal:
-				case SqlDbType.SmallMoney:
-				case SqlDbType.Money: return "Decimal";
-				case SqlDbType.Float: return "Double";
-				case SqlDbType.Real: return "Single";
-				case SqlDbType.Date:
-				case SqlDbType.DateTime:
-				case SqlDbType.SmallDateTime: return "DateTime";
-				case SqlDbType.Char:
-				case SqlDbType.VarChar:
-				case SqlDbType.Text:
-				case SqlDbType.NChar:
-				case SqlDbType.NVarChar:
-				case SqlDbType.NText: return "String";
-				case SqlDbType.Binary:
-				case SqlDbType.VarBinary:
-				case SqlDbType.Image: return "Object";
-				case SqlDbType.UniqueIdentifier: return "Guid";
-				case SqlDbType.Timestamp:
-				default: return "Object";
-			}
-		}
-
-		protected static string GetCSConvert(SqlDbType type) {
-			switch (type) {
-				case SqlDbType.Bit: return "bool.TryParse({0}, out {1})";
-				case SqlDbType.TinyInt: return "byte.TryParse({0}, out {1})";
-				case SqlDbType.SmallInt: return "short.TryParse({0}, out {1})";
-				case SqlDbType.Int: return "int.TryParse({0}, out {1})";
-				case SqlDbType.BigInt: return "long.TryParse({0}, out {1})";
-				case SqlDbType.Decimal:
-				case SqlDbType.SmallMoney:
-				case SqlDbType.Money: return "decimal.TryParse({0}, out {1})";
-				case SqlDbType.Float: return "double.TryParse({0}, out {1})";
-				case SqlDbType.Real: return "float.TryParse({0}, out {1})";
-				case SqlDbType.Date:
-				case SqlDbType.DateTime:
-				case SqlDbType.SmallDateTime: return "DateTime.TryParse({0}, out {1})";
-				case SqlDbType.Char:
-				case SqlDbType.VarChar:
-				case SqlDbType.Text:
-				case SqlDbType.NChar:
-				case SqlDbType.NVarChar:
-				case SqlDbType.NText: return "{1} = string.Concat({0})";
-				case SqlDbType.Binary:
-				case SqlDbType.VarBinary:
-				case SqlDbType.Image: return "{1} = (Byte[]){0}";
-				case SqlDbType.UniqueIdentifier: return "{1} = (Guid){0}";
-				case SqlDbType.Timestamp:
-				default: return "{1} = {0}";
-			}
-		}
-		protected static string GetCSConvert2(SqlDbType type) {
-			switch (type) {
-				case SqlDbType.Bit: return "bool.Parse({0})";
-				case SqlDbType.TinyInt: return "byte.Parse({0})";
-				case SqlDbType.SmallInt: return "short.Parse({0})";
-				case SqlDbType.Int: return "int.Parse({0})";
-				case SqlDbType.BigInt: return "long.Parse({0})";
-				case SqlDbType.Decimal:
-				case SqlDbType.SmallMoney:
-				case SqlDbType.Money: return "decimal.Parse({0})";
-				case SqlDbType.Float: return "double.Parse({0})";
-				case SqlDbType.Real: return "float.Parse({0})";
-				case SqlDbType.Date:
-				case SqlDbType.DateTime:
-				case SqlDbType.SmallDateTime: return "DateTime.Parse({0})";
-				case SqlDbType.Char:
-				case SqlDbType.VarChar:
-				case SqlDbType.Text:
-				case SqlDbType.NChar:
-				case SqlDbType.NVarChar:
-				case SqlDbType.NText: return "{1} = string.Concat({0})";
-				case SqlDbType.Binary:
-				case SqlDbType.VarBinary:
-				case SqlDbType.Image: return "{1} = (Byte[]){0}";
-				case SqlDbType.UniqueIdentifier: return "{1} = (Guid){0}";
-				case SqlDbType.Timestamp:
-				default: return "{1} = {0}";
 			}
 		}
 
@@ -265,7 +159,10 @@ namespace Server {
 				case SqlDbType.Real: return "GetFloat";
 				case SqlDbType.Date:
 				case SqlDbType.DateTime:
+				case SqlDbType.DateTime2:
 				case SqlDbType.SmallDateTime: return "GetDateTime";
+				case SqlDbType.DateTimeOffset: return "GetDateTimeOffset";
+				case SqlDbType.Time: return "GetDateTime";
 				case SqlDbType.Char:
 				case SqlDbType.VarChar:
 				case SqlDbType.Text:
@@ -276,7 +173,7 @@ namespace Server {
 				case SqlDbType.VarBinary:
 				case SqlDbType.Image: return "GetBytes";
 				case SqlDbType.UniqueIdentifier: return "GetGuid";
-				case SqlDbType.Timestamp:
+				case SqlDbType.Timestamp: return "GetBytes";
 				default: return "GetValue";
 			}
 		}
@@ -297,8 +194,11 @@ namespace Server {
 					// "'\" + _" + CodeBuild.UFString(columnInfo.Name) + " +\r\n				\"'";
 				case SqlDbType.Date:
 				case SqlDbType.DateTime:
+				case SqlDbType.DateTime2:
 				//string.Format("\", {0} == null ? \"null\" : string.Concat(\"Date(\", {0}.Value.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds, \")\"), \r\n				\"", CodeBuild.UFString(columnInfo.Name));
 				case SqlDbType.SmallDateTime: return string.Format("{0} == null ? \"null\" : string.Concat(\"\", {0}.Value.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds, \"\")", CodeBuild.UFString(columnInfo.Name));
+				case SqlDbType.DateTimeOffset: return string.Format("{0} == null ? \"null\" : string.Concat(\"\", {0}.Value.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds, \"\")", CodeBuild.UFString(columnInfo.Name));
+				case SqlDbType.Time: return string.Format("{0} == null ? \"null\" : string.Concat(\"\", {0}.Value.Ticks, \"\")", CodeBuild.UFString(columnInfo.Name));
 
 				case SqlDbType.Binary:
 				case SqlDbType.VarBinary:
@@ -315,8 +215,7 @@ namespace Server {
 				// return "'\" + (_" + CodeBuild.UFString(columnInfo.Name) + " == null ? string.Empty : _" + CodeBuild.UFString(columnInfo.Name) + ".Replace(\"\\\\\", \"\\\\\\\\\").Replace(\"\\r\\n\", \"\\\\r\\\\n\").Replace(\"'\", \"\\\\'\")) + \r\n				\"'";
 				case SqlDbType.NText: return string.Format("{0} == null ? \"null\" : string.Format(\"'{{0}}'\", {0}.Replace(\"\\\\\", \"\\\\\\\\\").Replace(\"\\r\\n\", \"\\\\r\\\\n\").Replace(\"'\", \"\\\\'\"))", CodeBuild.UFString(columnInfo.Name));
 
-				case SqlDbType.Timestamp:
-				//return "'\" + (_" + CodeBuild.UFString(columnInfo.Name) + " == null ? string.Empty : _" + CodeBuild.UFString(columnInfo.Name) + ".ToString().Replace(\"\\\\\", \"\\\\\\\\\").Replace(\"\\r\\n\", \"\\\\r\\\\n\").Replace(\"'\", \"\\\\'\")) + \r\n				\"'";
+				case SqlDbType.Timestamp: return string.Format("{0} == null ? \"null\" : Convert.ToBase64String({0})", CodeBuild.UFString(columnInfo.Name));
 				default: return string.Format("{0} == null ? \"null\" : {0}.ToString()", CodeBuild.UFString(columnInfo.Name)); 
 			}
 		}
@@ -334,7 +233,10 @@ namespace Server {
 				case SqlDbType.Real: return string.Format("{0}", CodeBuild.UFString(columnInfo.Name));
 				case SqlDbType.Date:
 				case SqlDbType.DateTime:
+				case SqlDbType.DateTime2:
 				case SqlDbType.SmallDateTime: return string.Format("{0}.Value.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds", CodeBuild.UFString(columnInfo.Name));
+				case SqlDbType.DateTimeOffset: return string.Format("{0}.Value.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds", CodeBuild.UFString(columnInfo.Name));
+				case SqlDbType.Time: return string.Format("{0}.Value.Ticks", CodeBuild.UFString(columnInfo.Name));
 
 				case SqlDbType.Binary:
 				case SqlDbType.VarBinary:
@@ -370,7 +272,10 @@ namespace Server {
 
 				case SqlDbType.Date:
 				case SqlDbType.DateTime:
-                case SqlDbType.SmallDateTime: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".ToString()";
+				case SqlDbType.DateTime2:
+				case SqlDbType.SmallDateTime: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".Value.Ticks.ToString()";
+				case SqlDbType.DateTimeOffset: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".Value.Ticks.ToString()";
+				case SqlDbType.Time: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".Value.Ticks.ToString()";
 
 				case SqlDbType.Binary:
                 case SqlDbType.VarBinary:
@@ -384,8 +289,8 @@ namespace Server {
                 case SqlDbType.NVarChar:
                 case SqlDbType.NText: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".Replace(\"|\", StringifySplit)";
 
-				case SqlDbType.Timestamp:
-                default: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".ToString().Replace(\"|\", StringifySplit)";
+				case SqlDbType.Timestamp: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : Convert.ToBase64String(_" + CodeBuild.UFString(columnInfo.Name) + ")";
+				default: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".ToString().Replace(\"|\", StringifySplit)";
             }
         }
         protected static string GetStringifyParse(SqlDbType type)
@@ -404,8 +309,11 @@ namespace Server {
                 case SqlDbType.Real: return "float.Parse({0})";
 				case SqlDbType.Date:
 				case SqlDbType.DateTime:
-                case SqlDbType.SmallDateTime: return "DateTime.Parse({0})";
-                case SqlDbType.Char:
+				case SqlDbType.DateTime2:
+				case SqlDbType.SmallDateTime: return "DateTime.Parse({0})";
+				case SqlDbType.DateTimeOffset: return "DateTimeOffset.Parse({0})";
+				case SqlDbType.Time: return "TimeSpan.Parse({0})";
+				case SqlDbType.Char:
                 case SqlDbType.VarChar:
                 case SqlDbType.Text:
                 case SqlDbType.NChar:
@@ -415,8 +323,8 @@ namespace Server {
                 case SqlDbType.VarBinary:
                 case SqlDbType.Image: return "Convert.FromBase64String({0})";
                 case SqlDbType.UniqueIdentifier: return "(Guid){0}";
-                case SqlDbType.Timestamp:
-                default: return "{0}";
+                case SqlDbType.Timestamp: return "Convert.FromBase64String({0})";
+				default: return "{0}";
             }
         }
 
@@ -437,8 +345,8 @@ namespace Server {
 
 		protected static string AppendParameter(ColumnInfo columnInfo, string value, string place) {
 			if (columnInfo == null) return "";
-
-			string returnValue = place + string.Format("GetParameter(\"{0}{1}\", SqlDbType.{2}, {3}, {4}), \r\n",
+			
+			string returnValue = place + string.Format("new SqlParameter {{ ParameterName = \"{0}{1}\", SqlDbType = SqlDbType.{2}, Size = {3}, Value = {4} }}, \r\n",
 				columnInfo.Name.StartsWith("@") ? null : "@", columnInfo.Name, columnInfo.Type,
 				columnInfo.Length.ToString(),
 				//columnInfo.Type == SqlDbType.Image ? string.Format("{0} == null ? 0 : {0}.Length", value + Lib.UFString(columnInfo.Name)) : columnInfo.Length.ToString(),

@@ -19,6 +19,7 @@ using System.Text;
 using System.Threading;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Reflection;
 
 public class BaseSocket {
 
@@ -104,10 +105,21 @@ public class BaseSocket {
 	}
 	public static object Deserialize(byte[] stream) {
 		IFormatter formatter = new BinaryFormatter();
+		formatter.Binder = new TransmissionBinder();
 		MemoryStream ms = new MemoryStream(stream);
 		object obj = formatter.Deserialize(ms);
 		ms.Close();
 		return obj;
+	}
+}
+
+internal class TransmissionBinder : SerializationBinder {
+	public override Type BindToType(string assemblyName, string typeName) {
+		var ass = AppDomain.CurrentDomain.GetAssemblies();
+		foreach (var a in ass) if (a.FullName == assemblyName) return a.GetType(typeName);
+		foreach (var a in ass) if (a.GetName().Name == "Common") return a.GetType(typeName);
+
+		return Type.GetType(typeName);
 	}
 }
 
