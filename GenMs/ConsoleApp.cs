@@ -388,7 +388,11 @@ Github: https://github.com/2881099/dotnetgen_sqlserver
 				}
 				if (File.Exists(Path.Combine(OutputPath, "GenMs只更新db.bat")) == false) {
 					var batPath = Path.Combine(OutputPath, $"GenMs_{this.SolutionName}_{this.Server}_{this.Database}.bat");
-					if (File.Exists(batPath) == false) File.WriteAllText(batPath, $@"
+					if (File.Exists(batPath) == false)
+						if (string.IsNullOrEmpty(this.Username))
+							File.WriteAllText(batPath, $@"
+GenMs {this.Server} -D {this.Database} -N {this.SolutionName}");
+						else File.WriteAllText(batPath, $@"
 GenMs {this.Server} -U {this.Username} -P {this.Password} -D {this.Database} -N {this.SolutionName}");
 				}
 			}

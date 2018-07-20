@@ -2815,7 +2815,8 @@ u.UpdateDiy.SetLogin_time(DateTime.Now).ExecuteNonQuery();
 				#endregion
 
 				#region GenMs只更新db.bat
-				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\GenMs只更新db.bat"), Deflate.Compress(string.Format(@"
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\GenMs只更新db.bat"), string.IsNullOrEmpty(_client.Username) ? Deflate.Compress(string.Format(@"
+GenMs {0} -D {3} -N {4}", _client.Server, _client.Username, _client.Password, _client.Database, solutionName)) : Deflate.Compress(string.Format(@"
 GenMs {0} -U {1} -P {2} -D {3} -N {4}", _client.Server, _client.Username, _client.Password, _client.Database, solutionName))));
 				clearSb();
 				#endregion
