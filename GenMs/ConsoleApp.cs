@@ -356,7 +356,7 @@ Github: https://github.com/2881099/dotnetgen_sqlserver
 			Configuration = {servicesName = m.Groups[1].Value}.BuildServiceProvider().GetService<IConfiguration>();";
 							}, RegexOptions.Multiline);
 						}
-						if (startupCode.IndexOf(this.SolutionName + ".BLL.PSqlHelper.Initialization") == -1) {
+						if (startupCode.IndexOf(this.SolutionName + ".BLL.SqlHelper.Initialization") == -1) {
 							startupCode = Regex.Replace(startupCode, @"([\t ]+public\s+void\s+Configure\s*\()([^\{]+)\{", m => {
 								isChanged = true;
 								var str1 = m.Groups[1].Value;
@@ -376,7 +376,7 @@ Github: https://github.com/2881099/dotnetgen_sqlserver
 								return str1 + str2 + $@"{{
 
 			
-			{this.SolutionName}.BLL.PSqlHelper.Initialization({appName.Groups[1].Value}.ApplicationServices.GetService<IDistributedCache>(), Configuration.GetSection(""{this.SolutionName}_BLL_ITEM_CACHE""),
+			{this.SolutionName}.BLL.SqlHelper.Initialization({appName.Groups[1].Value}.ApplicationServices.GetService<IDistributedCache>(), Configuration.GetSection(""{this.SolutionName}_BLL_ITEM_CACHE""),
 				{connStr}, {loggerFactory.Groups[1].Value}.CreateLogger(""{this.SolutionName}_DAL_sqlhelper""));
 
 
