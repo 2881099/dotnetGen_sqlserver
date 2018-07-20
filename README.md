@@ -11,6 +11,8 @@
 
 > 使用 navicat 模型工具创建和管理 ER 图，从数据库导入/同步结构到数据库，打心底里好用..
 
+> 也可以使用 Microsoft SQL Server Management Studio 数据库关系图管理 ER 图..
+
 [下载生成器客户端试用](https://files.cnblogs.com/files/kellynic/%E7%94%9F%E6%88%90%E5%99%A8mssql.zip)，或者安装命令工具 dotnet tool install -g GenMs
 
 共勉，一起学习QQ群：8578575
@@ -29,6 +31,8 @@ GenMs 服务器 -U 登陆名 -P 密码 -D 数据库1 -N 命名空间
 ```shell
 GenMs 服务器 -U 登陆名 -P 密码 -D 数据库1 -N 命名空间 -R -S -A
 ```
+
+dotnetGen 保持相同的开发与使用习惯，现实了面向 mysql、SQLServer、PostgreSQL 三种数据库快速开发，也可混合使用。
 
 | <font color=gray>功能对比</font> | [dotnetGen_mysql](https://github.com/2881099/dotnetGen_mysql) | [dotnetGen_sqlserver](https://github.com/2881099/dotnetGen_sqlserver) | [dotnetGen_postgresql](https://github.com/2881099/dotnetGen_postgresql) |
 | ----------------: | --------------: | -------------------: | -------------------: |
