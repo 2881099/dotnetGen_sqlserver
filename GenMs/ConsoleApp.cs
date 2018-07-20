@@ -169,7 +169,7 @@ Github: https://github.com/2881099/dotnetgen_sqlserver
 			this._client = new ClientInfo(this.Server, this.Username, this.Password);
 			StreamReader sr = new StreamReader(System.Net.WebRequest.Create("https://files.cnblogs.com/files/kellynic/GenMs_server.css").GetResponse().GetResponseStream(), Encoding.UTF8);
 			string server = sr.ReadToEnd()?.Trim();
-			server = "127.0.0.1:29918";
+			//server = "127.0.0.1:29918";
 			Uri uri = new Uri("tcp://" + server + "/");
 			this._socket = new ClientSocket();
 			this._socket.Error += Socket_OnError;
