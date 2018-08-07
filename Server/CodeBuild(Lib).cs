@@ -310,8 +310,8 @@ namespace Server {
 				case SqlDbType.Date:
 				case SqlDbType.DateTime:
 				case SqlDbType.DateTime2:
-				case SqlDbType.SmallDateTime: return "DateTime.Parse({0})";
-				case SqlDbType.DateTimeOffset: return "DateTimeOffset.Parse({0})";
+				case SqlDbType.SmallDateTime: return "new DateTime(long.Parse({0}))";
+				case SqlDbType.DateTimeOffset: return "new DateTimeOffset(new DateTime(long.Parse({0})))";
 				case SqlDbType.Time: return "TimeSpan.Parse({0})";
 				case SqlDbType.Char:
                 case SqlDbType.VarChar:
