@@ -422,7 +422,7 @@ public static partial class {0}ExtensionMethods {{
 		<AssemblyName>{0}.db</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include=""dng.Mssql"" Version=""1.1.5"" />
+		<PackageReference Include=""dng.Mssql"" Version=""1.1.6"" />
 		<PackageReference Include=""CSRedisCore"" Version=""2.3.9.2"" />
 	</ItemGroup>
 </Project>
