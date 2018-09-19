@@ -205,6 +205,8 @@ where a.object_id in ({0})
 				bool is_primary_key = bool.Parse(string.Concat(row[4]));
 				bool is_clustered = bool.Parse(string.Concat(row[5]));
 				int is_desc = int.Parse(string.Concat(row[6]));
+
+				if (loc3.ContainsKey(object_id) == false || loc3[object_id].ContainsKey(column) == false) continue;
 				ColumnInfo loc9 = loc3[object_id][column];
 				if (loc9.IsClustered == false && is_clustered) loc9.IsClustered = is_clustered;
 				if (loc9.IsPrimaryKey == false && is_primary_key) loc9.IsPrimaryKey = is_primary_key;
