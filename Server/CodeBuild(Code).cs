@@ -1971,6 +1971,7 @@ namespace {0}.BLL {{
 								colvalue = "DateTime.Now";
 							} else {
 								string csType2 = csType;
+								if (csType2 == "bool?") csType2 = "bool";
 								itemCsParamInsertForm += string.Format(", [FromForm] {0} {1}", csType2, csUName);
 								itemCsParamUpdateForm += string.Format(", [FromForm] {0} {1}", csType2, csUName);
 								colvalue = csUName;
