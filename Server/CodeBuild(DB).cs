@@ -151,7 +151,9 @@ where a.object_id in ({1})
 from sys.columns", loc8);
 			if (loc88.Length > 0) {
 				tsql += "union all" +
-				string.Format(tsql_place, @"
+				string.Format(tsql_place.Replace(
+					"left join sys.extended_properties AS c ON c.major_id = a.object_id AND c.minor_id = a.column_id", 
+					"left join sys.extended_properties AS c ON c.major_id = a.object_id AND c.minor_id = a.parameter_id"), @"
 ,cast(0 as bit) 'IsNullable'
 ,a.is_output 'IsIdentity'
 from sys.parameters", loc88);

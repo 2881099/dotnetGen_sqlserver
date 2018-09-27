@@ -2,7 +2,7 @@
   "profiles": {
     "GenPg": {
       "commandName": "Project",
-      "commandLineArgs": ". -D cms -N css -S -A -R -O d:/css"
+      "commandLineArgs": ". -D shop -N es -S -A -R -O d:/css"
     }
   }
 }

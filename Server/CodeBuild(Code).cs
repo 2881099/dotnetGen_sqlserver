@@ -2540,7 +2540,7 @@ namespace {0}.BLL {{
 				}
 				if (table.Columns.Count == 0) {
 					sb1.AppendFormat(@"
-		public static void {0}() => SqlHelper.ExecuteNonQuery(CommandType.StoredProcedure, @""{1}"");
+		public static void {0}() => SqlHelper.Instance.ExecuteNonQuery(CommandType.StoredProcedure, @""{1}"");
 ", uClass_Name, nTable_Name);
 				} else {
 					if (setOutParmsNull.Count > 0) setOutParmsNull.Add("");
@@ -2553,7 +2553,7 @@ namespace {0}.BLL {{
 			{3}{5}SqlParameter[] parms = new SqlParameter[] {{
 				{4}
 			}};
-			SqlHelper.ExecuteNonQuery(CommandType.StoredProcedure, @""{7}"", parms);
+			SqlHelper.Instance.ExecuteNonQuery(CommandType.StoredProcedure, @""{7}"", parms);
 		}}
 		#endregion
 ", uClass_Name,
