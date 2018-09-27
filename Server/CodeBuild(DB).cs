@@ -122,7 +122,7 @@ order by type desc, b.name, a.name
 
 			string tsql_place = @"
 select 
-concat(e.name,'.',d.name)
+isnull(e.name,'') + '.' + isnull(d.name,'')
 ,a.Object_id
 ,a.name 'Column'
 ,b.name 'Type'

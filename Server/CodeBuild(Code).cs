@@ -325,6 +325,7 @@ namespace {0}.Model {{
 			}}
 			internal set {{ _obj_{1} = value; }}
 		}}
+
 ", FK_uClass_Name_full, memberName, solutionName, fkcsBy, fkcsParms, FK_uClass_Name, fkcsIfNull);
 							//若不存在 Obj_外键表名，则增加，否则InnerJoin.ToList时会报错 “Obj_外键表名 不存在”
 							//比如表只有一 creator_person_id 时，需附加成生一个 Obj_person 属性
@@ -378,6 +379,7 @@ namespace {0}.Model {{
 				_{0} = value;
 			}}
 		}}
+
 ", uColumn_Name);
 						sb2.Append(tmpsetvalue);
 						sb2.Append(tmpinfo);
@@ -387,6 +389,7 @@ namespace {0}.Model {{
 			get {{ return _{1}; }}
 			set {{ _{1} = value; }}
 		}}
+
 ", csType, uColumn_Name, prototype_comment);
 					}
 					sb3.AppendFormat("{0} {1}, ", csType, uColumn_Name);
@@ -2051,7 +2054,7 @@ namespace {0}.BLL {{
 					else mn_{1}_list.RemoveAt(idx);
 				}}
 				mn_{1}_list.ForEach(a => item.Flag{1}(a));
-			}}", GetCSType(fk2[0].ReferencedColumns[0].Type).Replace("?", ""), UFString(addname), addname);
+			}}", GetCSType(fk2[0].ReferencedColumns[0].Type).Replace("?", ""), UFString(addname), LFString(addname));
 						str_addhtml_mn += string.Format(@"
 						<tr>
 							<td>{1}</td>
