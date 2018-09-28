@@ -2536,7 +2536,7 @@ namespace {0}.BLL {{
 					csParms.Add(nameOut + csType + " " + name);
 					csParmsNoType.Add(nameOut + name);
 					dimParms.Add(sqlParm +
-						string.Format(@"GetParameter(""{0}"", SqlDbType.{1}, {2}, {3})", column.Name, column.Type, column.Length, name));
+						string.Format(@"new SqlParameter {{ ParameterName = ""{0}"", SqlDbType = SqlDbType.{1}, Size = {2}, Value = {3} }}", column.Name, column.Type, column.Length, name));
 				}
 				if (table.Columns.Count == 0) {
 					sb1.AppendFormat(@"
@@ -2549,11 +2549,18 @@ namespace {0}.BLL {{
 					if (dimOutParmsReturn.Count > 0) dimOutParmsReturn.AddRange(new string[] { "", "" });
 					sb1.AppendFormat(@"
 		#region {0}
-		public static void {0}({1}) {{
-			{3}{5}SqlParameter[] parms = new SqlParameter[] {{
+		public static void {0}({1}) => {0}({2}, false);
+		public static List<object[][]> {0}Return({1}) => {0}({2}, true);
+		private static List<object[][]> {0}({1}, bool isReturn) {{
+			{3}{5}var sqlParams = new[] {{
 				{4}
 			}};
-			SqlHelper.Instance.ExecuteNonQuery(CommandType.StoredProcedure, @""{7}"", parms);
+			{6}List<object[][]> ds = null;
+
+			if (isReturn) ds = ExecuteArrayAll(@""{7}"", sqlParams);
+			else SqlHelper.Instance.ExecuteNonQuery(CommandType.StoredProcedure, @""{7}"", sqlParams);
+
+			{8}return ds;
 		}}
 		#endregion
 ", uClass_Name,
@@ -2571,10 +2578,27 @@ namespace {0}.BLL {{
 			}
 
 			sb1.AppendFormat(@"
-		public static SqlParameter GetParameter(string name, SqlDbType type, int size, object value) {{
-			SqlParameter parm = new SqlParameter(name, type, size);
-			parm.Value = value;
-			return parm;
+		/// <summary>
+		/// 执行存储过程，可能有多个结果集返回
+		/// </summary>
+		/// <param name=""procedure"">存储过程</param>
+		/// <param name=""sqlParams"">参数</param>
+		/// <returns></returns>
+		public static List<object[][]> ExecuteArrayAll(string procedure, params SqlParameter[] sqlParams) {{
+			var ds = new List<object[][]>();
+			SqlHelper.Instance.ExecuteReader(dr => {{
+				while (true) {{
+					var dt = new List<object[]>();
+					while (dr.Read()) {{
+						object[] values = new object[dr.FieldCount];
+						dr.GetValues(values);
+						dt.Add(values);
+					}}
+					ds.Add(dt.ToArray());
+					if (dr.NextResult() == false) break;
+				}}
+			}}, CommandType.StoredProcedure, procedure, sqlParams);
+			return ds;
 		}}
 	}}
 }}");
