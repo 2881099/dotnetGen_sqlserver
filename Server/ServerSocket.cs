@@ -1,4 +1,4 @@
-using System;
+锘縰sing System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -180,7 +180,7 @@ public class ServerSocket : IDisposable {
 		this.OnError(e);
 	}
 
-	#region IDisposable 成员
+	#region IDisposable 鎴愬憳
 
 	public void Dispose() {
 		this.Stop();
@@ -218,6 +218,7 @@ public class AcceptSocket : BaseSocket, IDisposable {
 					ns.ReadTimeout = 1000 * 20;
 					if (ns.DataAvailable) {
 						SocketMessager messager = base.Read(ns);
+						Server.Protocol.debugAppendLog?.Invoke(messager.ToString());
 						if (string.Compare(messager.Action, SocketMessager.SYS_TEST_LINK.Action) != 0) {
 							ServerSocketReceiveEventArgs e = new ServerSocketReceiveEventArgs(this._receives++, messager, this);
 							SyncReceive receive = null;
@@ -329,7 +330,7 @@ public class AcceptSocket : BaseSocket, IDisposable {
 	}
 
 	/// <summary>
-	/// 拒绝访问，并关闭连接
+	/// 鎷掔粷璁块棶锛屽苟鍏抽棴杩炴帴
 	/// </summary>
 	public void AccessDenied() {
 		this._server.AccessDenied(this);
@@ -380,7 +381,7 @@ public class AcceptSocket : BaseSocket, IDisposable {
 			get { return _receiveHandler; }
 		}
 
-		#region IDisposable 成员
+		#region IDisposable 鎴愬憳
 
 		public void Dispose() {
 			this._wait.Set();
@@ -390,7 +391,7 @@ public class AcceptSocket : BaseSocket, IDisposable {
 		#endregion
 	}
 
-	#region IDisposable 成员
+	#region IDisposable 鎴愬憳
 
 	void IDisposable.Dispose() {
 		this.Close();
