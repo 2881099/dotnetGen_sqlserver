@@ -106,8 +106,8 @@ namespace Server {
 				case SqlDbType.NText: return "{0}";
 				case SqlDbType.Binary:
 				case SqlDbType.VarBinary:
-				case SqlDbType.Image:
-				case SqlDbType.UniqueIdentifier: return "string.Concat({0})";
+				case SqlDbType.Image: return "string.Concat({0})";
+				case SqlDbType.UniqueIdentifier: return "{0}.Value";
 				case SqlDbType.Timestamp: return "string.Concat({0})";
 				default: return "string.Concat({0})";
 			}
@@ -205,7 +205,7 @@ namespace Server {
 				// return "\" + (_" + CodeBuild.UFString(columnInfo.Name) + " == null ? null : Encoding.UTF8.GetString(_" + CodeBuild.UFString(columnInfo.Name) + ")) +\r\n				\"";
 				case SqlDbType.Image: return string.Format("{0} == null ? \"null\" : Convert.ToBase64String({0})", CodeBuild.UFString(columnInfo.Name));
 				//return "'\" + _" + CodeBuild.UFString(columnInfo.Name) + " +\r\n				\"'";
-				case SqlDbType.UniqueIdentifier: return string.Format("{0}", CodeBuild.UFString(columnInfo.Name));
+				case SqlDbType.UniqueIdentifier: return string.Format("{0} == null ? \"null\" : {0}.ToString()", CodeBuild.UFString(columnInfo.Name));
 
 				case SqlDbType.Char:
 				case SqlDbType.VarChar:
@@ -280,9 +280,9 @@ namespace Server {
 				case SqlDbType.Binary:
                 case SqlDbType.VarBinary:
                 case SqlDbType.Image: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : Convert.ToBase64String(_" + CodeBuild.UFString(columnInfo.Name) + ")";
-                case SqlDbType.UniqueIdentifier: return "_" + CodeBuild.UFString(columnInfo.Name);
+                case SqlDbType.UniqueIdentifier: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".ToString()";
 
-                case SqlDbType.Char:
+				case SqlDbType.Char:
                 case SqlDbType.VarChar:
                 case SqlDbType.Text:
                 case SqlDbType.NChar:
@@ -322,7 +322,7 @@ namespace Server {
                 case SqlDbType.Binary:
                 case SqlDbType.VarBinary:
                 case SqlDbType.Image: return "Convert.FromBase64String({0})";
-                case SqlDbType.UniqueIdentifier: return "(Guid){0}";
+                case SqlDbType.UniqueIdentifier: return "Guid.Parse({0})";
                 case SqlDbType.Timestamp: return "Convert.FromBase64String({0})";
 				default: return "{0}";
             }
