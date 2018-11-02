@@ -488,19 +488,19 @@ namespace {0}.Model {{
 					int ms = 0;
 					//若中间表，两外键指向相同表，则选择 表名_主键名 此字段作为主参考字段
 					string main_column = fk.Columns[0].Name;
+					var pkName = fk.ReferencedColumns[0].Name;
 					foreach (ColumnInfo columnInfo in t2.Columns) {
 						var cstype = GetCSType(columnInfo.Type);
 						bool is_addignore = columnInfo.IsPrimaryKey && cstype == "Guid?" ||
 							 columnInfo.Name.ToLower() == "update_time" && cstype == "DateTime?" ||
 							 columnInfo.Name.ToLower() == "create_time" && cstype == "DateTime?";
 						if (string.Compare(columnInfo.Name, main_column, true) == 0) {
-							parmsNoneType2 += string.Format("\r\n			{0} = this.{1}, ", UFString(columnInfo.Name), UFString(table.PrimaryKeys[0].Name));
-							//if (!is_addignore) parmsNoneType2_add += string.Format("\r\n			{0} = this.{1}, ", UFString(columnInfo.Name), UFString(table.PrimaryKeys[0].Name));
+							parmsNoneType2 += string.Format("\r\n			{0} = this.{1}, ", UFString(columnInfo.Name), UFString(pkName));
+							//if (!is_addignore) parmsNoneType2_add += string.Format("\r\n			{0} = this.{1}, ", UFString(columnInfo.Name), UFString(pkName));
 
-							parmsNoneType4 += string.Format(GetCSTypeValue(columnInfo.Type), "this." + UFString(table.PrimaryKeys[0].Name)) + ", ";
-							parmsNoneType5 += string.Format("\r\n			item.{0} = this.{1};", UFString(columnInfo.Name), UFString(table.PrimaryKeys[0].Name));
-							if (columnInfo.IsPrimaryKey) pkNamesNoneType += string.Format(GetCSTypeValue(table.PrimaryKeys[0].Type), "this." + UFString(table.PrimaryKeys[0].Name)) + ", ";
-							//"this." + UFString(table.PrimaryKeys[0].Name) + ", ";
+							parmsNoneType4 += string.Format(GetCSTypeValue(columnInfo.Type), "this." + UFString(pkName)) + ", ";
+							parmsNoneType5 += string.Format("\r\n			item.{0} = this.{1};", UFString(columnInfo.Name), UFString(pkName));
+							if (columnInfo.IsPrimaryKey) pkNamesNoneType += string.Format(GetCSTypeValue(fk.ReferencedColumns[0].Type), "this." + UFString(pkName)) + ", ";
 							continue;
 						}
 						if (columnInfo.IsPrimaryKey) pkNamesNoneType += string.Format(GetCSTypeValue(columnInfo.Type), UFString(columnInfo.Name)) + ", ";
@@ -640,19 +640,19 @@ namespace {0}.Model {{
 		public {0}Info Unflag{1}({4}) => BLL.{0}.Delete{9}({5});
 		public List<{0}Info> Unflag{1}ALL() => BLL.{0}.DeleteBy{8}(this.{7});
 ", UFString(t2.ClassName), UFString(addname_schema), parms3, parmsNoneType3, parms4, parmsNoneType4,
-	solutionName, string.Format(GetCSTypeValue(table.PrimaryKeys[0].Type), UFString(table.PrimaryKeys[0].Name)),
+	solutionName, string.Format(GetCSTypeValue(fk.ReferencedColumns[0].Type), UFString(pkName)),
 							UFString(fk.Columns[0].Name), deleteByUniqui);
 						sb16.AppendFormat(@"
 		async public Task<{0}Info> Unflag{1}Async({2}) => await Unflag{1}Async({3});
 		async public Task<{0}Info> Unflag{1}Async({4}) => await BLL.{0}.Delete{9}Async({5});
 		async public Task<List<{0}Info>> Unflag{1}ALLAsync() => await BLL.{0}.DeleteBy{8}Async(this.{7});
 ", UFString(t2.ClassName), UFString(addname_schema), parms3, parmsNoneType3, parms4, parmsNoneType4,
-	solutionName, string.Format(GetCSTypeValue(table.PrimaryKeys[0].Type), UFString(table.PrimaryKeys[0].Name)),
+	solutionName, string.Format(GetCSTypeValue(fk.ReferencedColumns[0].Type), UFString(pkName)),
 							UFString(fk.Columns[0].Name), deleteByUniqui);
 						if (ms > 2) {
 
 						} else {
-							string civ = string.Format(GetCSTypeValue(table.PrimaryKeys[0].Type), "_" + UFString(table.PrimaryKeys[0].Name));
+							string civ = string.Format(GetCSTypeValue(fk.ReferencedColumns[0].Type), "_" + UFString(pkName));
 							string f5 = t2name;
 							//if (addname != f5) {
 							string fk20_ReferencedTable_Name = fk2[0].ReferencedTable.Name;
@@ -706,7 +706,7 @@ namespace {0}.Model {{
 		public {0}Info Obj_{1} {{
 			get {{ return _obj_{1} ?? (_{4} == null ? null : (_obj_{1} = BLL.{0}.GetItem(_{5}))); }}
 			internal set {{ _obj_{1} = value; }}
-		}}", UFString(t2.ClassName), LFString(t2.ClassName), solutionName, UFString(fk.Columns[0].Name), UFString(table.PrimaryKeys[0].Name), string.Format(GetCSTypeValue(table.PrimaryKeys[0].Type), UFString(table.PrimaryKeys[0].Name)));
+		}}", UFString(t2.ClassName), LFString(t2.ClassName), solutionName, UFString(fk.Columns[0].Name), UFString(fk.ReferencedColumns[0].Name), string.Format(GetCSTypeValue(fk.ReferencedColumns[0].Type), UFString(fk.ReferencedColumns[0].Name)));
 							string objs_key = string.Format("Obj_{0}", f2);
 							if (!dic_objs.ContainsKey(objs_key))
 								dic_objs.Add(objs_key, obj_value);
