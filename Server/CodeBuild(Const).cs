@@ -471,7 +471,7 @@ public static partial class {0}ExtensionMethods {{
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include=""dng.Mssql"" Version=""1.1.23"" />
-		<PackageReference Include=""CSRedisCore"" Version=""3.0.16"" />
+		<PackageReference Include=""CSRedisCore"" Version=""3.0.18"" />
 	</ItemGroup>
 </Project>
 ";
@@ -488,7 +488,7 @@ public static partial class {0}ExtensionMethods {{
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Caching.CSRedis"" Version=""3.0.16"" />
+		<PackageReference Include=""Caching.CSRedis"" Version=""3.0.18"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.1.1"" />
@@ -858,7 +858,8 @@ namespace {0}.WebHost {{
 	<PropertyGroup>
 		<TargetFramework>netcoreapp2.1</TargetFramework>
 		<WarningLevel>3</WarningLevel>
-		<PostBuildEvent>gulp --gulpfile ../../../gulpfile.js copy-module</PostBuildEvent>
+		<ServerGarbageCollection>false</ServerGarbageCollection>
+		<MvcRazorCompileOnPublish>false</MvcRazorCompileOnPublish>
 	</PropertyGroup>
 	<ItemGroup>
 		<Folder Include=""wwwroot\"" />
@@ -880,10 +881,13 @@ namespace {0}.WebHost {{
 	<ItemGroup>
 		<PackageReference Include=""Microsoft.AspNetCore.App"" />
 	</ItemGroup>
+	<Target Name=""PostBuild"" AfterTargets=""PostBuildEvent"">
+		<Exec Command=""gulp --gulpfile gulpfile.js copy-module"" />
+	</Target>
 </Project>
 ";
 			#endregion
-			
+
 			public static readonly string Module_Admin_Controllers_SysController =
 			#region 内容太长已被收起
  @"using System;
