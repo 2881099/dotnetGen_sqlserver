@@ -340,7 +340,7 @@ Github: https://github.com/2881099/dotnetgen_sqlserver
 					var appsettings = Newtonsoft.Json.JsonConvert.DeserializeObject(File.Exists(appsettingsPath) ? File.ReadAllText(appsettingsPath) : "{}") as JToken;
 					var oldtxt = appsettings.ToString();
 					if (appsettings["ConnectionStrings"] == null) appsettings["ConnectionStrings"] = new JObject();
-					if (appsettings["ConnectionStrings"][$"{this.SolutionName}_mssql"] == null) appsettings["ConnectionStrings"][$"{this.SolutionName}_mssql"] = this.ConnectionString + "Pooling=true;Max Pool Size=100";
+					if (appsettings["ConnectionStrings"][$"{this.SolutionName}_mssql"] == null) appsettings["ConnectionStrings"][$"{this.SolutionName}_mssql"] = this.ConnectionString + ";Pooling=true;Max Pool Size=100";
 					if (appsettings["ConnectionStrings"]["redis1"] == null) appsettings["ConnectionStrings"]["redis1"] = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=10,ssl=false,writeBuffer=20480,prefix={this.SolutionName}";
 					if (appsettings["ConnectionStrings"]["redis2"] == null) appsettings["ConnectionStrings"]["redis2"] = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=10,ssl=false,writeBuffer=20480,prefix={this.SolutionName}";
 					if (appsettings[$"{this.SolutionName}_BLL_ITEM_CACHE"] == null) appsettings[$"{this.SolutionName}_BLL_ITEM_CACHE"] = JToken.FromObject(new {
