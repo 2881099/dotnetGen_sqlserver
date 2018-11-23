@@ -2638,6 +2638,11 @@ namespace {0}.BLL {{
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Module\Test\Controllers\TestController.cs"), Deflate.Compress(sb1.ToString())));
 				clearSb();
 				#endregion
+				#region Init.cs
+				sb1.AppendFormat(CONST.Module_Test_Init_cs, solutionName, "Test");
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Module\Test\Init.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
 				#region appsettings.json
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Module\Test\appsettings.json"), Deflate.Compress("{\r\n}")));
 				clearSb();
@@ -2976,6 +2981,11 @@ GenMs {0} -U {1} -P {2} -D {3} -N {4}", _client.Server, _client.Username, _clien
 				#region wwwroot\index.html
 				sb1.AppendFormat(CONST.Module_Admin_wwwroot_index_html, solutionName, wwwroot_sitemap);
 				loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"wwwroot\index.html"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region Init.cs
+				sb1.AppendFormat(CONST.Module_Test_Init_cs, solutionName, "Admin");
+				loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"Init.cs"), Deflate.Compress(sb1.ToString())));
 				clearSb();
 				#endregion
 				#region appsettings.json
