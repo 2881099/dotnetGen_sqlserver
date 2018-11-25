@@ -1700,15 +1700,21 @@ namespace {0}.BLL {{
 					if (byItems.ContainsKey(fkcsBy)) return;
 					byItems.Add(fkcsBy, true);
 
+					string comment = _column_coments.ContainsKey(table.FullName) && _column_coments[table.FullName].ContainsKey(col.Name) ? _column_coments[table.FullName][col.Name] : col.Name;
+					string prototype_comment = comment == col.Name ? "" : string.Format(@"/// <summary>
+		/// {0}，多个参数等于 OR 查询
+		/// </summary>
+		", comment.Replace("\r\n", "\n").Replace("\n", "\r\n		/// "));
+
 					if (csType == "bool?" || csType == "Guid?") {
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(@""a.[{3}] = {{0}}"", {1});", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name);
+		{4}public {0}SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(@""a.[{3}] = {{0}}"", {1});", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name, prototype_comment);
 						return;
 					}
 					if (col.Type == SqlDbType.Int || col.Type == SqlDbType.BigInt || col.Type == SqlDbType.SmallInt || col.Type == SqlDbType.TinyInt || 
 						col.Type == SqlDbType.Real || col.Type == SqlDbType.Float || col.Type == SqlDbType.Decimal || col.Type == SqlDbType.Money) {
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(@""a.[{3}] = {{0}}"", {1});", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name);
+		{4}public {0}SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(@""a.[{3}] = {{0}}"", {1});", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name, prototype_comment);
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}Range({2} begin) => base.Where(@""a.[{3}] >= {{0}}"", begin);
 		public {0}SelectBuild Where{1}Range({2} begin, {2} end) => end == null ? this.Where{1}Range(begin) : base.Where(@""a.[{3}] between {{0}} and {{1}}"", begin, end);", uClass_Name, fkcsBy, csType, col.Name);
@@ -1718,7 +1724,7 @@ namespace {0}.BLL {{
 						col.Type == SqlDbType.DateTimeOffset || col.Type == SqlDbType.SmallDateTime || col.Type == SqlDbType.Time) {
 						if (col.IsPrimaryKey)
 							sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}({2} {1}) => base.Where(@""a.[{3}] = {{0}}"", {1});", uClass_Name, fkcsBy, csType, col.Name);
+		{4}public {0}SelectBuild Where{1}({2} {1}) => base.Where(@""a.[{3}] = {{0}}"", {1});", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}Range({2} begin) => base.Where(@""a.[{3}] >= {{0}}"", begin);
 		public {0}SelectBuild Where{1}Range({2} begin, {2} end) => end == null ? this.Where{1}Range(begin) : base.Where(@""a.[{3}] between {{0}} and {{1}}"", begin, end);", uClass_Name, fkcsBy, csType, col.Name);
@@ -1735,9 +1741,9 @@ namespace {0}.BLL {{
 						return;
 					}
 					if (csType == "string") {
-						if (col.Length < 301)
+						if (col.Length > 0 && col.Length < 301)
 							sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(@""a.[{3}] = {{0}}"", {1});", uClass_Name, fkcsBy, csType, col.Name);
+		{4}public {0}SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(@""a.[{3}] = {{0}}"", {1});", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}Like(string pattern, bool isNotLike = false) {{
 			var opt = isNotLike ? ""LIKE"" : ""NOT LIKE"";
