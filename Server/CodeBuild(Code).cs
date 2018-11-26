@@ -1116,7 +1116,7 @@ namespace {0}.DAL {{
 							}
 						}
 						sb6.AppendFormat(@"
-				.Set{0}(item.{0})", CodeBuild.UFString(col.Name));
+			if (ignore.ContainsKey(""{1}"") == false) sub.Set{0}(item.{0});", CodeBuild.UFString(col.Name), col.Name);
 					}
 
 					string dal_insert_code = string.Format(@"
@@ -1174,8 +1174,10 @@ namespace {0}.DAL {{
 					sb1.AppendFormat(@"
 {1}
 
-		public SqlUpdateBuild Update({0}Info item) {{
-			return new SqlUpdateBuild(new List<{0}Info> {{ item }}, false){8};
+		public SqlUpdateBuild Update({0}Info item, string[] ignoreFields) {{
+			var sub = new SqlUpdateBuild(new List<{0}Info> {{ item }}, false);
+			var ignore = ignoreFields?.ToDictionary(a => a, StringComparer.CurrentCultureIgnoreCase) ?? new Dictionary<string, string>();{8}
+			return sub;
 		}}
 		#region class SqlUpdateBuild
 		public partial class SqlUpdateBuild {{
@@ -1418,7 +1420,7 @@ namespace {0}.BLL {{
 ", sb2.ToString());
 					if (uniques_dic.Count > 1)
 						sb1.AppendFormat(@"
-		public static int Update({1}Info item) => dal.Update(item).ExecuteNonQuery();
+		public static int Update({1}Info item, params string[] ignoreFields) => dal.Update(item, ignoreFields).ExecuteNonQuery();
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => new {0}.DAL.{1}.SqlUpdateBuild(new List<{1}Info> {{ itemCacheTimeout > 0 ? new {1}Info {{ {4} }} : GetItem({3}) }}, false);
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy(List<{1}Info> dataSource) => new {0}.DAL.{1}.SqlUpdateBuild(dataSource, true);
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiyDangerous => new {0}.DAL.{1}.SqlUpdateBuild();
@@ -1429,7 +1431,7 @@ namespace {0}.BLL {{
 							xxxxtempskdf += xxxxtempskdfstr + " = " + xxxxtempskdfstr + ", ";
 						}
 						sb1.AppendFormat(@"
-		public static int Update({1}Info item) => dal.Update(item).ExecuteNonQuery();
+		public static int Update({1}Info item, params string[] ignoreFields) => dal.Update(item, ignoreFields).ExecuteNonQuery();
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => new {0}.DAL.{1}.SqlUpdateBuild(new List<{1}Info> {{ new {1}Info {{ {4} }} }}, false);
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy(List<{1}Info> dataSource) => new {0}.DAL.{1}.SqlUpdateBuild(dataSource, true);
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiyDangerous => new {0}.DAL.{1}.SqlUpdateBuild();
@@ -1437,7 +1439,7 @@ namespace {0}.BLL {{
 					}
 
 					bll_async_code += string.Format(@"
-		async public static Task<int> UpdateAsync({1}Info item) => await dal.Update(item).ExecuteNonQueryAsync();
+		async public static Task<int> UpdateAsync({1}Info item, params string[] ignoreFields) => await dal.Update(item, ignoreFields).ExecuteNonQueryAsync();
 ", solutionName, uClass_Name);
 
 					if (table.Columns.Count > 5)
