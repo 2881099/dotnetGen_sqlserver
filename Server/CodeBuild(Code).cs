@@ -1398,15 +1398,15 @@ namespace {0}.BLL {{
 					*/
 
 					sb3.AppendFormat(@"
-		public static {1}Info GetItem{2}({4}) => SqlHelper.CacheShell(string.Concat(""{0}_BLL_{1}{2}_"", {3}), itemCacheTimeout, () => Select{7}.ToOne());", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
+		public static {1}Info GetItem{2}({4}) => SqlHelper.CacheShell(string.Concat(""{0}_BLL:{1}{2}:"", {3}), itemCacheTimeout, () => Select{7}.ToOne());", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
 		parms, parmsNoneType, cacheCond, whereCondi);
 
 					bll_async_code += string.Format(@"
-		async public static Task<{1}Info> GetItem{2}Async({4}) => await SqlHelper.CacheShellAsync(string.Concat(""{0}_BLL_{1}{2}_"", {3}), itemCacheTimeout, () => Select{7}.ToOneAsync());", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
+		async public static Task<{1}Info> GetItem{2}Async({4}) => await SqlHelper.CacheShellAsync(string.Concat(""{0}_BLL:{1}{2}:"", {3}), itemCacheTimeout, () => Select{7}.ToOneAsync());", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
 		parms, parmsNoneType, cacheCond, whereCondi);
 
 					sb4.AppendFormat(@"
-				keys[keysIdx++] = string.Concat(""{0}_BLL_{1}{2}_"", {3});", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove);
+				keys[keysIdx++] = string.Concat(""{0}_BLL:{1}{2}:"", {3});", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove);
 				}
 
 				if (table.PrimaryKeys.Count > 0) {
@@ -1763,7 +1763,7 @@ namespace {0}.BLL {{
 							sb6.AppendFormat(@"
 			{4}public SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(@""a.[{3}] = {{0}}"", {1});", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
 						sb6.AppendFormat(@"
-			public SelectBuild Where{1}Like(string pattern, bool isNotLike = false) => this.Where($@""a.[{3}] {{(isNotLike ? ""LIKE"" : ""NOT LIKE"")}} {{{{0}}}}"", pattern);", uClass_Name, fkcsBy, csType, col.Name);
+			public SelectBuild Where{1}Like(string pattern, bool isNotLike = false) => this.Where($@""a.[{3}] {{(isNotLike ? ""NOT LIKE"" : ""LIKE"")}} {{{{0}}}}"", pattern);", uClass_Name, fkcsBy, csType, col.Name);
 						return;
 					}
 				});
