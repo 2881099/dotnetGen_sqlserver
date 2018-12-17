@@ -14,7 +14,7 @@
  * 1、新项目开发，只管设计数据ER图，无须考虑db相关代码；
  * 2、老项目数据库访问方式不堪入目的，表数量越多收益越大；
 
-[下载生成器winform客户端](https://files.cnblogs.com/files/kellynic/%E7%94%9F%E6%88%90%E5%99%A8mssql.zip)，推荐安装命令工具 dotnet tool install -g GenMs
+[下载生成器winform客户端](%E7%94%9F%E6%88%90%E5%99%A8mssql.zip)，推荐安装命令工具 dotnet tool install -g GenMs
 
 * [.NETCore 快速开发做一个简易商城](https://www.cnblogs.com/kellynic/p/9712483.html)
 * [.NETCore 基于 dbfirst 体验快速开发项目](https://www.cnblogs.com/kellynic/p/9706082.html)
