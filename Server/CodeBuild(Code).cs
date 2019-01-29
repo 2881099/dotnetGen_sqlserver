@@ -1019,6 +1019,7 @@ namespace {0}.DAL {{
 					sqlParms = sqlParms.Substring(0, sqlParms.Length - 5);
 					sqlParmsA = sqlParmsA.Substring(0, sqlParmsA.Length - 5);
 					sqlParmsANoneType = sqlParmsANoneType.Substring(0, sqlParmsANoneType.Length - 2);
+					if (del_exists.ContainsKey(parms)) continue;
 					del_exists.Add(parms, true);
 
 					sb2.AppendFormat(@"
