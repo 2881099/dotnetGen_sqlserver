@@ -956,7 +956,7 @@ namespace {0}.DAL {{
 						}
 						sb1.AppendFormat(
 	@"
-			if (!dr.IsDBNull(++dataIndex)) item.{0} = GetBytes(dr, ++dataIndex);", UFString(columnInfo.Name));
+			if (!dr.IsDBNull(++dataIndex)) item.{0} = GetBytes(dr, dataIndex);", UFString(columnInfo.Name));
 					} else if (CodeBuild.GetDataReaderMethod(columnInfo.Type) == "GetValue") {
 						sb1.AppendFormat(
 	@"
