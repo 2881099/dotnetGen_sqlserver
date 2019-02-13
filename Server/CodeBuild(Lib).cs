@@ -43,6 +43,7 @@ namespace Server {
 				case "image": return SqlDbType.Image;
 				case "timestamp": return SqlDbType.Timestamp;
 				case "uniqueidentifier": return SqlDbType.UniqueIdentifier;
+				case "xml": return SqlDbType.Xml;
 				default: return SqlDbType.Variant;
 			}
 		}
@@ -74,8 +75,9 @@ namespace Server {
 				case SqlDbType.Binary:
 				case SqlDbType.VarBinary:
 				case SqlDbType.Image: return "(byte[])";
-				case SqlDbType.UniqueIdentifier: return "(Guid?)";
 				case SqlDbType.Timestamp: return "(byte[])";
+				case SqlDbType.UniqueIdentifier: return "(Guid?)";
+				case SqlDbType.Xml: return "(string)";
 				default: return "";
 			}
 		}
@@ -107,8 +109,9 @@ namespace Server {
 				case SqlDbType.Binary:
 				case SqlDbType.VarBinary:
 				case SqlDbType.Image: return "string.Concat({0})";
-				case SqlDbType.UniqueIdentifier: return "{0}.Value";
 				case SqlDbType.Timestamp: return "string.Concat({0})";
+				case SqlDbType.UniqueIdentifier: return "{0}.Value";
+				case SqlDbType.Xml: return "{0}";
 				default: return "string.Concat({0})";
 			}
 		}
@@ -139,8 +142,9 @@ namespace Server {
 				case SqlDbType.Binary:
 				case SqlDbType.VarBinary:
 				case SqlDbType.Image: return "byte[]";
-				case SqlDbType.UniqueIdentifier: return "Guid?";
 				case SqlDbType.Timestamp: return "byte[]";
+				case SqlDbType.UniqueIdentifier: return "Guid?";
+				case SqlDbType.Xml: return "string";
 				default: return "object";
 			}
 		}
@@ -162,7 +166,7 @@ namespace Server {
 				case SqlDbType.DateTime2:
 				case SqlDbType.SmallDateTime: return "GetDateTime";
 				case SqlDbType.DateTimeOffset: return "GetDateTimeOffset";
-				case SqlDbType.Time: return "GetDateTime";
+				case SqlDbType.Time: return "GetTimeSpan";
 				case SqlDbType.Char:
 				case SqlDbType.VarChar:
 				case SqlDbType.Text:
@@ -172,8 +176,9 @@ namespace Server {
 				case SqlDbType.Binary:
 				case SqlDbType.VarBinary:
 				case SqlDbType.Image: return "GetBytes";
-				case SqlDbType.UniqueIdentifier: return "GetGuid";
 				case SqlDbType.Timestamp: return "GetBytes";
+				case SqlDbType.UniqueIdentifier: return "GetGuid";
+				case SqlDbType.Xml: return "GetValue";
 				default: return "GetValue";
 			}
 		}
@@ -207,6 +212,7 @@ namespace Server {
 				//return "'\" + _" + CodeBuild.UFString(columnInfo.Name) + " +\r\n				\"'";
 				case SqlDbType.UniqueIdentifier: return string.Format("{0} == null ? \"null\" : {0}.ToString()", CodeBuild.UFString(columnInfo.Name));
 
+				case SqlDbType.Xml:
 				case SqlDbType.Char:
 				case SqlDbType.VarChar:
 				case SqlDbType.Text:
@@ -243,6 +249,7 @@ namespace Server {
 				case SqlDbType.Image: return string.Format("Convert.ToBase64String({0})", CodeBuild.UFString(columnInfo.Name));
 				case SqlDbType.UniqueIdentifier: return string.Format("{0}", CodeBuild.UFString(columnInfo.Name));
 
+				case SqlDbType.Xml:
 				case SqlDbType.Char:
 				case SqlDbType.VarChar:
 				case SqlDbType.Text:
@@ -282,6 +289,7 @@ namespace Server {
                 case SqlDbType.Image: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : Convert.ToBase64String(_" + CodeBuild.UFString(columnInfo.Name) + ")";
                 case SqlDbType.UniqueIdentifier: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".ToString()";
 
+				case SqlDbType.Xml:
 				case SqlDbType.Char:
                 case SqlDbType.VarChar:
                 case SqlDbType.Text:
@@ -322,8 +330,9 @@ namespace Server {
                 case SqlDbType.Binary:
                 case SqlDbType.VarBinary:
                 case SqlDbType.Image: return "Convert.FromBase64String({0})";
-                case SqlDbType.UniqueIdentifier: return "Guid.Parse({0})";
                 case SqlDbType.Timestamp: return "Convert.FromBase64String({0})";
+                case SqlDbType.UniqueIdentifier: return "Guid.Parse({0})";
+				case SqlDbType.Xml: return "{0}.Replace(StringifySplit, \"|\")";
 				default: return "{0}";
             }
         }
