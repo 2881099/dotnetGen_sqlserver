@@ -106,7 +106,7 @@ namespace Server {
 					break;
 				default:
 					e.AcceptSocket.AccessDenied();
-					debugAppendLog?.Invoke($"AccessDenied(default): 未现实");
+					debugAppendLog?.Invoke($"AccessDenied(default): 未实现");
 					break;
 			}
 		}
